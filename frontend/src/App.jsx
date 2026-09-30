@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-const API_URL = 'http://127.0.0.1:8000';
+const rawApiUrl = (import.meta.env.VITE_API_URL || '').trim();
+const API_BASE = rawApiUrl.endsWith('/') ? rawApiUrl.slice(0, -1) : rawApiUrl;
 
 const STARTER_PROMPTS = [
   {
@@ -264,7 +265,7 @@ export default function App() {
     }
 
     try {
-      const response = await fetch(`${API_URL}/chat`, {
+      const response = await fetch(`${API_BASE}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

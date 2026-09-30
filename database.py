@@ -8,6 +8,10 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, rela
 
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./chatbot.db")
 
+# In Vercel serverless environment, local filesystem is read-only except /tmp
+if os.getenv("VERCEL") and DATABASE_URL.startswith("sqlite") and not DATABASE_URL.startswith("sqlite:////tmp"):
+    DATABASE_URL = "sqlite:////tmp/chatbot.db"
+
 engine_kwargs = {"future": True}
 if DATABASE_URL.startswith("sqlite"):
     engine_kwargs["connect_args"] = {"check_same_thread": False}

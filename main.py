@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     app_name: str = " Chatbot "
     openai_api_key: str = ""
     openai_model: str = "gpt-4o-mini"
+    openai_base_url: str = ""
     database_url: str = "sqlite:///./chatbot.db"
     rag_documents_path: str = "documents"
     cors_origins: str = "http://localhost:3000,http://localhost:5173,http://127.0.0.1:3000"
@@ -29,7 +30,7 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
-openai_service = OpenAIService(settings.openai_api_key, settings.openai_model)
+openai_service = OpenAIService(settings.openai_api_key, settings.openai_model, settings.openai_base_url)
 rag_service = RAGService(settings.rag_documents_path)
 tool_registry = ToolRegistry()
 
@@ -60,6 +61,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.allowed_origins,
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -74,12 +76,14 @@ def startup() -> None:
 
 
 @app.get("/health")
+@app.get("/api/health")
 def health_check() -> dict[str, str]:
     mode = "live-openai" if openai_service.has_valid_api_key() else "local-demo-rag"
     return {"status": "ok", "service": settings.app_name, "environment_mode": mode}
 
 
 @app.post("/chat", response_model=ChatResponse)
+@app.post("/api/chat", response_model=ChatResponse)
 async def chat(
     payload: ChatRequest,
     db: Session = Depends(get_db),
@@ -152,6 +156,8 @@ async def chat(
 
 
 @app.get("/")
+@app.get("/api")
+@app.get("/api/")
 def root() -> dict[str, str]:
     return {"message": "Welcome to the Company AI Chatbot API."}
 

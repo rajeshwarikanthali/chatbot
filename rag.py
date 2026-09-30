@@ -10,12 +10,20 @@ except ImportError:  # pragma: no cover - optional dependency for PDFs
 
 class RAGService:
     def __init__(self, documents_path: str = "documents") -> None:
-        self.documents_path = Path(documents_path)
+        doc_path = Path(documents_path)
+        if not doc_path.is_absolute() and not doc_path.exists():
+            fallback = Path(__file__).resolve().parent / documents_path
+            if fallback.exists():
+                doc_path = fallback
+        self.documents_path = doc_path
         self.documents: list[dict[str, str]] = []
         self.index_documents()
 
     def index_documents(self) -> None:
-        self.documents_path.mkdir(parents=True, exist_ok=True)
+        try:
+            self.documents_path.mkdir(parents=True, exist_ok=True)
+        except OSError:
+            pass
         found_documents: list[dict[str, str]] = []
 
         for extension in ("*.txt", "*.md", "*.pdf"):

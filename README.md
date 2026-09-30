@@ -267,6 +267,41 @@ Open API docs:
 http://localhost:8000/docs
 ```
 
+## 12. Deploy to Vercel
+
+This repository is pre-configured for full-stack deployment on Vercel:
+- **Frontend**: Built using Vite and served directly via Vercel's Global CDN.
+- **Backend API**: Python FastAPI serverless function hosted at `/api/*` via `api/index.py`.
+
+### Deploy via Vercel Web Dashboard (Recommended)
+
+1. Commit and push your code to your GitHub repository:
+   ```bash
+   git add .
+   git commit -m "Configure Vercel deployment"
+   git push origin main
+   ```
+2. Go to [vercel.com](https://vercel.com) and click **"Add New..."** > **"Project"**.
+3. Import your GitHub repository (`chatbot`).
+4. Keep the default settings (Vercel will detect `vercel.json` automatically).
+5. In the **Environment Variables** section, add:
+   - `OPENAI_API_KEY`: Your OpenAI API key (or Groq/compatible API key)
+   - `OPENAI_MODEL`: `gpt-4o-mini` (or your chosen model)
+   - `OPENAI_BASE_URL`: (Optional, e.g. `https://api.groq.com/openai/v1`)
+   - `DATABASE_URL`: (Optional) A cloud PostgreSQL connection string (such as free Neon or Supabase). If omitted, SQLite is used in `/tmp/chatbot.db`.
+6. Click **Deploy**.
+
+### Deploy via Vercel CLI
+
+You can also deploy directly from your terminal:
+```bash
+npx vercel
+```
+Follow the interactive prompts, and when prompted to deploy to production:
+```bash
+npx vercel --prod
+```
+
 ## License
 
 This project is intended for internal company use and can be adapted for your own deployment environment.
