@@ -1,56 +1,28 @@
 {
-  "version": 2,
-  "env": {
-    "PYTHONPATH": "."
-  },
-  "builds": [
+  "rewrites": [
     {
-      "src": "frontend/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
+      "source": "/api/chat",
+      "destination": "/api/chat.py"
     },
     {
-      "src": "api/*.py",
-      "use": "@vercel/python"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/chat",
-      "dest": "/api/chat.py"
+      "source": "/api/health",
+      "destination": "/api/health.py"
     },
     {
-      "src": "/api/health",
-      "dest": "/api/health.py"
+      "source": "/api/(.*)",
+      "destination": "/api/index.py"
     },
     {
-      "src": "/api/(.*)",
-      "dest": "/api/index.py"
+      "source": "/chat",
+      "destination": "/api/chat.py"
     },
     {
-      "src": "/chat",
-      "dest": "/api/chat.py"
+      "source": "/health",
+      "destination": "/api/health.py"
     },
     {
-      "src": "/health",
-      "dest": "/api/health.py"
-    },
-    {
-      "src": "/docs",
-      "dest": "/api/index.py"
-    },
-    {
-      "src": "/openapi.json",
-      "dest": "/api/index.py"
-    },
-    {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
