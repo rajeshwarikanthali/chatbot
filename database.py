@@ -9,14 +9,19 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, rela
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./chatbot.db")
 
 # In Vercel serverless environment, local filesystem is read-only except /tmp
-if os.getenv("VERCEL") and DATABASE_URL.startswith("sqlite") and not DATABASE_URL.startswith("sqlite:////tmp"):
+is_serverless = bool(os.getenv("VERCEL") or os.getenv("VERCEL_ENV") or os.getenv("AWS_LAMBDA_FUNCTION_NAME"))
+if is_serverless and DATABASE_URL.startswith("sqlite") and not DATABASE_URL.startswith("sqlite:////tmp"):
     DATABASE_URL = "sqlite:////tmp/chatbot.db"
 
 engine_kwargs = {"future": True}
 if DATABASE_URL.startswith("sqlite"):
     engine_kwargs["connect_args"] = {"check_same_thread": False}
 
-engine = create_engine(DATABASE_URL, **engine_kwargs)
+try:
+    engine = create_engine(DATABASE_URL, **engine_kwargs)
+except Exception:
+    engine = create_engine("sqlite:///:memory:", connect_args={"check_same_thread": False})
+
 SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 
 
@@ -60,7 +65,10 @@ class ChatMessage(Base):
 
 
 def init_db() -> None:
-    Base.metadata.create_all(bind=engine)
+    try:
+        Base.metadata.create_all(bind=engine)
+    except Exception as exc:
+        print(f"Warning: init_db failed: {exc}")
 
 
 def get_db() -> Generator[Session, None, None]:

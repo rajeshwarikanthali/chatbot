@@ -25,7 +25,7 @@
       "destination": "/api/index.py"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!assets/|api/|docs|redoc|openapi.json|favicon.ico).*)",
       "destination": "/index.html"
     }
   ]
