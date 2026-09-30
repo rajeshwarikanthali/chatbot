@@ -276,9 +276,17 @@ export default function App() {
         }),
       });
 
-      const data = await response.json();
+      let data = {};
+      const contentType = response.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        data = await response.json();
+      } else {
+        const text = await response.text();
+        throw new Error(text.slice(0, 160) || `Server error (${response.status})`);
+      }
+
       if (!response.ok) {
-        throw new Error(data.detail || 'Request failed');
+        throw new Error(data.detail || data.message || `Request failed (${response.status})`);
       }
 
       const activeConvId = data.conversation_id;
