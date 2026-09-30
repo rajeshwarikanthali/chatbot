@@ -1,5 +1,8 @@
 {
   "version": 2,
+  "env": {
+    "PYTHONPATH": "."
+  },
   "builds": [
     {
       "src": "frontend/package.json",
@@ -9,30 +12,38 @@
       }
     },
     {
-      "src": "api/index.py",
+      "src": "api/*.py",
       "use": "@vercel/python"
     }
   ],
   "routes": [
     {
+      "src": "/api/chat",
+      "dest": "/api/chat.py"
+    },
+    {
+      "src": "/api/health",
+      "dest": "/api/health.py"
+    },
+    {
       "src": "/api/(.*)",
-      "dest": "api/index.py"
+      "dest": "/api/index.py"
     },
     {
       "src": "/chat",
-      "dest": "api/index.py"
+      "dest": "/api/chat.py"
     },
     {
       "src": "/health",
-      "dest": "api/index.py"
+      "dest": "/api/health.py"
     },
     {
       "src": "/docs",
-      "dest": "api/index.py"
+      "dest": "/api/index.py"
     },
     {
       "src": "/openapi.json",
-      "dest": "api/index.py"
+      "dest": "/api/index.py"
     },
     {
       "handle": "filesystem"
